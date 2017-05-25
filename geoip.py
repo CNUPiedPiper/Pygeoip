@@ -1,5 +1,7 @@
 #-*- coding: utf-8 -*-
 import pygeoip
+import requests
+from bs4 import BeautifulSoup
 
 gi = pygeoip.GeoIP('GeoLiteCity.dat')
 
@@ -7,14 +9,14 @@ def Record(target):
     rec = gi.record_by_name(target)
     country = rec['country_name']
     city = rec['city']
-    lon = rec['longitude']
     lat = rec['latitude']
-    print("Country : ", country)
-    print("City : ", city)
-    print("lon, lat : ", lon, lat)
+    lon = rec['longitude']
+    print(city, lat, lon)
+    return city, lat, lon
 
 if __name__ == "__main__":
-    f = open('ip.txt', 'r')
-    ip = f.readline()[11:-1]
-    f.close()
+    r = requests.get('http://ip.ojj.kr')
+    soup = BeautifulSoup(r.text, 'html.parser')
+    result = soup.find('font',attrs={'face':'verdana', 'color':'RED'})
+    ip = result.text
     Record(ip)
